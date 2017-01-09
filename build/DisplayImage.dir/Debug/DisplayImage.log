@@ -1,0 +1,3 @@
+﻿  abc.cpp
+D:\GitHub\Camera-Calibration\abc.cpp(175): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
+  DisplayImage.vcxproj -> D:\GitHub\Camera-Calibration\build\Debug\DisplayImage.exe

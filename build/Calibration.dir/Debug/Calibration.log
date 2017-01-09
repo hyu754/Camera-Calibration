@@ -1,0 +1,5 @@
+﻿  Building Custom Rule D:/GitHub/Camera-Calibration/CMakeLists.txt
+  CMake does not need to re-run because D:\GitHub\Camera-Calibration\build\CMakeFiles\generate.stamp is up-to-date.
+  camera_calibration.cpp
+D:\GitHub\Camera-Calibration\camera_calibration.cpp(175): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
+  Calibration.vcxproj -> D:\GitHub\Camera-Calibration\build\Debug\Calibration.exe
