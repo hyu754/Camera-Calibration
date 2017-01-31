@@ -1,4 +1,0 @@
-D:/GitHub/Camera-Calibration/build/CMakeFiles/Calibration.dir
-D:/GitHub/Camera-Calibration/build/CMakeFiles/dll_includes.dir
-D:/GitHub/Camera-Calibration/build/CMakeFiles/ALL_BUILD.dir
-D:/GitHub/Camera-Calibration/build/CMakeFiles/ZERO_CHECK.dir
