@@ -1,0 +1,3 @@
+﻿  calibration_class.cpp
+D:\GitHub\Camera-Calibration\calibration_class\source\calibration_class.cpp(204): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
+  camera_calib_lib.vcxproj -> D:\GitHub\Camera-Calibration\build\calibration_class\Debug\camera_calib_lib.lib
