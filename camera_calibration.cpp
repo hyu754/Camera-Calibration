@@ -47,17 +47,69 @@ int main(int argc, char** argv )
 	calibration_geometry cal_class;
 
 
-	VideoCapture *cap;
+	
 	
 	
 
 
 	if (cal_class.get_real_time_var() == 1){
-		cap = new VideoCapture(0);
-		if (cap->isOpened() == false){
+		VideoCapture *cap_left,*cap_right;
+		cap_left = new VideoCapture(1);
+		cap_right = new VideoCapture(0);
+		if ((cap_left->isOpened() == false) || (cap_right->isOpened() == false)){
 			std::cerr << "ERROR: could not open camera for real time capture" << std::endl;
 			return -1;
 		}
+		
+		cv::Mat left_in, right_in;
+		bool end_calibration= false;
+		while (!end_calibration){
+			*cap_left >> left_in;
+			*cap_right >> right_in;
+
+			imshow("left", left_in);
+			imshow("right", right_in);
+			char key_press = waitKey(1);
+
+
+			
+			if (key_press == ' '){
+
+				cal_class.read_in_images_camera(left_in,right_in);
+
+
+				cv::Mat *left_ptr, *right_ptr;
+				bool left_success = cal_class.calibrate(calibration::direction_t::left);
+				bool right_success = cal_class.calibrate(calibration::direction_t::right);
+				if (cal_class.corners_left.size() == cal_class.number_blocks){
+					left_ptr = cal_class.get_image_pointer(calibration::direction_t::left);
+					for (auto counter_o = cal_class.corners_left.begin(); counter_o != cal_class.corners_left.end(); ++counter_o){
+						cv::circle(*left_ptr, *counter_o, 3, cv::Scalar(200, 100, 200), 3);
+					}
+				}
+
+				if (cal_class.corners_right.size() == cal_class.number_blocks){
+					right_ptr = cal_class.get_image_pointer(calibration::direction_t::right);
+					for (auto counter_o = cal_class.corners_right.begin(); counter_o != cal_class.corners_right.end(); ++counter_o){
+						cv::circle(*right_ptr, *counter_o, 3, cv::Scalar(200, 100, 200), 3);
+					}
+				}
+
+
+				if (left_success&&right_success){
+					cal_class.update_image_points(calibration::direction_t::left);
+					cal_class.update_image_points(calibration::direction_t::right);
+					cal_class.update_chessboard();
+					cal_class.increase_sucess();
+					cal_class.display_images();
+				}
+			}
+			else if (key_press == 'e'){
+				end_calibration = true;
+			}
+			
+		}
+
 
 	}
 	
@@ -122,9 +174,9 @@ int main(int argc, char** argv )
 		cal_class.write_camera_properties_stereo();
 	}
 
-	//delete camera ptr if using camera
-	if (cal_class.get_real_time_var() == 1)
-		delete cap;
+	////delete camera ptr if using camera
+	//if (cal_class.get_real_time_var() == 1)
+	//	delete cap;
 
 
     return 0;

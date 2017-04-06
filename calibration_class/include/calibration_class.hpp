@@ -81,6 +81,9 @@ class calibration::calibration_geometry
 		//read in images from file
 		void read_in_images(void);
 
+		//read in images from stereo camera
+		void read_in_images_camera(cv::Mat image_left_in, cv::Mat image_right_in);
+
 		//display the images read from file
 		void display_images(void);
 

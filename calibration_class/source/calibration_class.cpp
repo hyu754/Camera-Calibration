@@ -92,6 +92,7 @@ bool calibration::calibration_geometry::file_in_range(void){
 	}
 }
 
+//read images from file
 void calibration::calibration_geometry::read_in_images(void){
 	if (type == calibration::calibration_t::stereo){
 		std::string filename_left = left_prefix + std::to_string(file_counter) + image_type;
@@ -103,6 +104,18 @@ void calibration::calibration_geometry::read_in_images(void){
 		file_counter++;
 	}
 }
+
+//read input from camera
+void calibration::calibration_geometry::read_in_images_camera(cv::Mat image_left_in, cv::Mat image_right_in){
+	if (type == calibration::calibration_t::stereo){
+		
+		image_left = image_left_in;
+		image_right = image_right_in;
+
+		
+	}
+}
+
 void calibration::calibration_geometry::display_images(void){
 	if ((image_left.size == 0) | (image_right.size == 0)){
 		std::cerr << "ERROR: one of the images are empty" << std::endl;
@@ -118,7 +131,7 @@ void calibration::calibration_geometry::calibrate_stereo_intrinsics(void){
 	std::cout << "Calibrating stereo intrinsics" << std::endl;
 
 	double rms_left = cv::calibrateCamera(object_points, image_points_left, image_left.size(), intrinsic_matrix[0], distortion_vector[0], cv::noArray(), cv::noArray());
-	double rms_right = cv::calibrateCamera(object_points, image_points_right, image_left.size(), intrinsic_matrix[1], distortion_vector[1], cv::noArray(), cv::noArray());
+	double rms_right = cv::calibrateCamera(object_points, image_points_right, image_right.size(), intrinsic_matrix[1], distortion_vector[1], cv::noArray(), cv::noArray());
 
 	std::cout << "RMS for left : " << rms_left << std::endl;
 	std::cout << "RMS for right : " << rms_right << std::endl;
@@ -212,23 +225,23 @@ calibration::calibration_geometry::calibration_geometry()
 	//Success counter
 	numSuccess = 0;
 
+	if (real_time == 0){
+		std::cout << "Please input left image prefix  (i.e. left_1.jpg, then enter left_): ";
+		std::cin >> left_prefix;
 
-	std::cout << "Please input left image prefix  (i.e. left_1.jpg, then enter left_): ";
-	std::cin >> left_prefix;
+		std::cout << "Please input right image prefix  (i.e. right_1.jpg, then enter left_): ";
+		std::cin >> right_prefix;
 
-	std::cout << "Please input right image prefix  (i.e. right_1.jpg, then enter left_): ";
-	std::cin >> right_prefix;
+		std::cout << "Please enter starting image suffix (i.e. for a list like left_1.jpg .... left_50.jpg enter \"1\" ): ";
+		std::cin >> begin_suffix;
+		std::cout << "Please enter ending image suffix (i.e. for a list like left_1.jpg .... left_50.jpg enter \"50\" ): ";
+		std::cin >> end_suffix;
 
-	std::cout << "Please enter starting image suffix (i.e. for a list like left_1.jpg .... left_50.jpg enter \"1\" ): ";
-	std::cin >> begin_suffix;
-	std::cout << "Please enter ending image suffix (i.e. for a list like left_1.jpg .... left_50.jpg enter \"50\" ): ";
-	std::cin >> end_suffix;
-
-	std::cout << "Please enter file type (.jpg, .png, etc): ";
-	std::cin >> image_type;
-
-
-	file_counter = begin_suffix;
+		std::cout << "Please enter file type (.jpg, .png, etc): ";
+		std::cin >> image_type;
+		file_counter = begin_suffix;
+	}
+	
 
 }
 
