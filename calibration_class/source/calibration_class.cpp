@@ -21,10 +21,22 @@ bool calibration::calibration_geometry::calibrate(direction_t dir_in){
 	std::vector<cv::Point2f> *corner_ptr;
 	(dir_in == left) ? img_ptr = &image_left : img_ptr = &image_right;
 	(dir_in == left) ? corner_ptr = &corners_left : corner_ptr = &corners_right;
-	bool found = cv::findChessboardCorners(*img_ptr, board_size, *corner_ptr, CV_CALIB_CB_ADAPTIVE_THRESH | CV_CALIB_CB_FILTER_QUADS);
 
 
 
+	cv::Mat gray_image;
+	img_ptr->copyTo(gray_image);
+	cv::cvtColor(gray_image, gray_image, CV_RGBA2GRAY);
+
+
+	bool found = cv::findChessboardCorners(gray_image, board_size, *corner_ptr, CV_CALIB_CB_ADAPTIVE_THRESH | CV_CALIB_CB_FILTER_QUADS);
+
+	if (found){
+		cv::TermCriteria criteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, 20, 0.001);
+		cv::cornerSubPix(gray_image, *corner_ptr, cv::Size(11, 11), cv::Size(-1, -1), criteria);
+		
+
+	}
 
 	return found;
 }
@@ -138,10 +150,16 @@ void calibration::calibration_geometry::calibrate_stereo_intrinsics(void){
 }
 
 void calibration::calibration_geometry::calibrate_stereo_parameters(void){
-	cv::TermCriteria criteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, 20, 0.001);
+	cv::TermCriteria criteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, 2000, 0.001);
 
 	std::cout << "Calibrating stereo parameters " << std::endl;
-	double rms_stereo = cv::stereoCalibrate(object_points, image_points_left, image_points_right, intrinsic_matrix[0], distortion_vector[0], intrinsic_matrix[1], distortion_vector[1], image_left.size(), R, T, E, F, CV_CALIB_RATIONAL_MODEL | CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_PRINCIPAL_POINT, criteria);
+	//if using fisheye lenses add CV_CALIB_RATIONAL_MODEL
+	double rms_stereo = cv::stereoCalibrate(object_points, image_points_left, image_points_right, intrinsic_matrix[0], distortion_vector[0], intrinsic_matrix[1], distortion_vector[1], image_left.size(), R, T, E, F, CALIB_FIX_ASPECT_RATIO +
+		CALIB_ZERO_TANGENT_DIST +
+		CALIB_USE_INTRINSIC_GUESS +
+		CALIB_SAME_FOCAL_LENGTH +
+		CALIB_RATIONAL_MODEL +
+		CALIB_FIX_K3 + CALIB_FIX_K4 + CALIB_FIX_K5, criteria);
 	cv::stereoRectify(intrinsic_matrix[0], distortion_vector[0], intrinsic_matrix[1], distortion_vector[1], image_left.size(), R, T, R1, R2, P1, P2, Q, CALIB_ZERO_DISPARITY);
 	
 	std::cout << "STEREO CALIBRATE ERROR : " << rms_stereo << std::endl;
